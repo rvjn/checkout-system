@@ -10,15 +10,26 @@ object CheckoutSystem {
   case object Apple extends Fruit { val price = 60 }
   case object Orange extends Fruit { val price = 25 }
 
+  case class Offer(fruit: Fruit, buySize: Int, paidSize: Int) {
+    def totalPrice(size: Int): BigDecimal = {
+      val count = size / buySize
+      ((count * paidSize) + (size % buySize)) * fruit.price / 100
+    }
+  }
+
   /**
-    * Returns price of fruits without any discount.
+    * Returns price of fruits with discounts.
     * @param fruits
     * @return String total price
     */
-  def checkout(fruits: Seq[Fruit]): String = totalPrice(fruits).toPounds
+  def checkout(fruits: Seq[Fruit]): String  = {
+    val apples = fruits.filter(_ == Apple).size
+    val oranges = fruits.size - apples
+    val totalPrice =
+      Offer(Apple, 2, 1).totalPrice(apples) + Offer(Orange, 3, 2).totalPrice(oranges)
 
-  private def totalPrice(fruits: Seq[Fruit]): BigDecimal = (fruits.map(_.price).sum) / 100
-
+    totalPrice.toPounds
+  }
 }
 
 object Extensions {
